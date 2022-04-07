@@ -1,9 +1,10 @@
-import subprocess as sub
-def shutdown_computer():
+import subprocess
+import time
+def shutdown_computer(waiting_time):
+    if waiting_time != '0':
+        time.sleep(int(waiting_time))
     try:
-        p = sub.Popen("shutdown /s /t 1", shell=True, stdout=sub.PIPE, stderr=sub.PIPE).communicate()[0]
-        a=p.decode("utf-8")
-    except:
-        return "Problem -- "+a
-
-shutdown_computer()
+        subprocess.Popen("shutdown /s /t 1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+        return "Computer Off"
+    except Exception as e:
+        return e

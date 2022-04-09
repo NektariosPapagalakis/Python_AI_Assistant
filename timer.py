@@ -1,3 +1,4 @@
+from threading import currentThread
 from tkinter import *
 from tkinter import messagebox
 import time
@@ -19,33 +20,51 @@ class Timer(Tk):
         self.seconds_countdown_start =0
 
         def go_to_countdown():
-            if self.timer_or_countdown_status == "timer":
-                self.title('Countdown')
-                self.timer_or_countdown_status = "countdown"
-                hour_entery.grid(row=0, column=0,padx=(2,10))
-                separator_3.grid(row=0, column=1,padx=(2,10))
-                minutes_entery.grid(row=0, column=2,padx=(2,10))
-                separator_4.grid(row=0, column=3,padx=(2,10))
-                seconds_entery.grid(row=0, column=4,padx=(2,10))
+            self.title('Countdown')
+            if self.timer_status == 'running':
                 stop_timer()
 
+            if self.timer_or_countdown_status == "clock":
+                frame_clock_buttons.pack_forget()
+                frame_timer_and_countdown_buttons.pack(pady=20)
+               
+            self.timer_or_countdown_status = "countdown"
+            hour_entery.grid(row=0, column=0,padx=(2,10))
+            separator_3.grid(row=0, column=1,padx=(2,10))
+            minutes_entery.grid(row=0, column=2,padx=(2,10))
+            separator_4.grid(row=0, column=3,padx=(2,10))
+            seconds_entery.grid(row=0, column=4,padx=(2,10))
+
         def go_to_timer():
+            self.title('Timer')
+            if self.timer_status == 'running':
+                stop_timer()
+            
             if self.timer_or_countdown_status == "countdown":
-                self.title('Timer')
-                self.timer_or_countdown_status = "timer"
                 hour_entery.grid_forget()
                 separator_3.grid_forget()
                 minutes_entery.grid_forget()
                 separator_4.grid_forget()
                 seconds_entery.grid_forget()
-                stop_timer()
+            
+            self.timer_or_countdown_status = "timer"
+            
 
         def go_to_clock():
-            start_button.grid_forget()
-            pause_button.grid_forget()
-            stop_button.grid_forget()
-            time_format_button.grid(row=0, column=10,padx=10)
-            start_timer()
+            self.title('Clock')
+            stop_timer()
+
+            if self.timer_or_countdown_status == "countdown":
+                hour_entery.grid_forget()
+                separator_3.grid_forget()
+                minutes_entery.grid_forget()
+                separator_4.grid_forget()
+                seconds_entery.grid_forget()
+            
+            self.timer_or_countdown_status = "clock"
+            frame_timer_and_countdown_buttons.pack_forget()
+            frame_clock_buttons.pack(pady=20)
+            clock()
 
         def timer():
             if self.timer_status == "running":
@@ -92,6 +111,19 @@ class Timer(Tk):
                 display_time()
                 #1000 ms -> 1 sec
                 self.after(1000,countdown)
+
+        def clock():
+            #self.hour = int(time.strftime("%H", time.localtime()))
+            self.hour = 15
+            if self.time_format == "12-Hour":
+                if self.hour == 0:
+                    self.hour = 12
+                elif self.hour>12:
+                    self.hour = self.hour - 12
+            self.minutes = int(time.strftime("%M", time.localtime()))
+            self.seconds = int(time.strftime("%S", time.localtime()))
+            self.timer_status = "running"
+            timer()
 
         def start_timer():                
             if self.timer_or_countdown_status == "timer":
@@ -154,15 +186,16 @@ class Timer(Tk):
         frame_timer_type = Frame(self)
         frame_time_labels = Frame(self)
         frame_time_enterys = Frame(self)
-        frame_buttons = Frame(self)
+        frame_timer_and_countdown_buttons = Frame(self)
+        frame_clock_buttons = Frame(self)
 
         #Time Enterys
         hour_entery = Entry(frame_time_enterys, width=5)
         hour_entery.insert(0, "00")
-        separator_3= Label(frame_time_labels,text=':', width=5)
+        separator_3= Label(frame_time_enterys,text=':', width=5)
         minutes_entery = Entry(frame_time_enterys, width=5)
         minutes_entery.insert(0, "00")
-        separator_4= Label(frame_time_labels,text=':', width=5)
+        separator_4= Label(frame_time_enterys,text=':', width=5)
         seconds_entery = Entry(frame_time_enterys, width=5)
         seconds_entery.insert(0, "00")
         #Time Labels
@@ -180,12 +213,12 @@ class Timer(Tk):
         timer_button = Button(frame_timer_type,text='Timer', width=10,foreground="red",command=go_to_timer)
         clock_button = Button(frame_timer_type,text='Clock', width=10,foreground="red",command=go_to_clock)
         
-        start_button = Button(frame_buttons,text='Start', width=10,foreground="red",command=start_timer)
-        pause_button = Button(frame_buttons,text='Pause', width=10,foreground="red",command=pause_timer)
-        stop_button = Button(frame_buttons,text='Stop', width=10,foreground="red",command=stop_timer)
+        start_button = Button(frame_timer_and_countdown_buttons,text='Start', width=10,foreground="red",command=start_timer)
+        pause_button = Button(frame_timer_and_countdown_buttons,text='Pause', width=10,foreground="red",command=pause_timer)
+        stop_button = Button(frame_timer_and_countdown_buttons,text='Stop', width=10,foreground="red",command=stop_timer)
 
-        time_format_button = Button(frame_buttons,text=self.time_format, width=10,foreground="red",command=change_time_format)
-
+        time_format_button = Button(frame_clock_buttons,text=self.time_format, width=10,foreground="red",command=change_time_format)
+        time_format_button.grid(row=0, column=10,padx=10)
 
         #Plece at Window
         frame_timer_type.pack(fill=BOTH, expand=YES)
@@ -205,10 +238,10 @@ class Timer(Tk):
         #--Seconds
         seconds_label.grid(row=0, column=4)
 
-        frame_buttons.pack(pady=20)
-        start_button.grid(row=0, column=9,padx=10)
-        pause_button.grid(row=0, column=10,padx=10)
-        stop_button.grid(row=0, column=11,padx=10)
+        frame_timer_and_countdown_buttons.pack(pady=20)
+        start_button.grid(row=0, column=0,padx=10)
+        pause_button.grid(row=0, column=1,padx=10)
+        stop_button.grid(row=0, column=2,padx=10)
 
     def on_closing(self, event=0):
         self.destroy()

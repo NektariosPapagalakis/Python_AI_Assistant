@@ -41,15 +41,6 @@ class Timer(Tk):
                 stop_timer()
 
         def go_to_clock():
-            current_time = time.strftime("%H:%M:%S").split(":")
-            self.hour = int(current_time[0])
-            if self.hour == 0:
-                self.hour = 12
-            elif self.hour >12:
-                self.hour = self.hour - 12
-            self.minutes = int(current_time[1])
-            self.seconds = int(current_time[2])
-
             start_button.grid_forget()
             pause_button.grid_forget()
             stop_button.grid_forget()

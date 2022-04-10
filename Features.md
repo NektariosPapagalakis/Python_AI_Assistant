@@ -6,3 +6,4 @@
 - [ ] Timer
 - [ ] Manage Spotify
 - [ ] Program shutdown time
+- [ ] Calendar

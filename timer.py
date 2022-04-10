@@ -113,8 +113,7 @@ class Timer(Tk):
                 self.after(1000,countdown)
 
         def clock():
-            #self.hour = int(time.strftime("%H", time.localtime()))
-            self.hour = 15
+            self.hour = int(time.strftime("%H", time.localtime()))
             if self.time_format == "12-Hour":
                 if self.hour == 0:
                     self.hour = 12
@@ -178,6 +177,7 @@ class Timer(Tk):
             elif self.time_format == "24-Hour":
                 self.time_format = "12-Hour"
             time_format_button.config(text=self.time_format)
+            go_to_clock()
         
         self.geometry("500x200")
         self.title('Timer')

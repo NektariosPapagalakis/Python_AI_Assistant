@@ -1,4 +1,3 @@
-from threading import currentThread
 from tkinter import *
 from tkinter import messagebox
 import time

@@ -1,7 +1,5 @@
 from tkinter import *
 import datetime
-import calendar
-import time
 
 class Timer(Tk):
 
@@ -9,11 +7,10 @@ class Timer(Tk):
         super(Timer,self).__init__()
 
         self.month_name = datetime.datetime.now().strftime("%B")
-        print (time.strptime(self.month_name,'%b').tm_mon)
         self.year = datetime.datetime.now().strftime("%Y")
 
         def put_numbers_on_grid():
-            print(print(calendar.month(2022, 4)))
+            print("ff")
 
         
         self.geometry("750x500")

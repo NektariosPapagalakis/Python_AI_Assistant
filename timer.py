@@ -2,10 +2,55 @@ from tkinter import *
 from tkinter import messagebox
 import time
 
-class Timer(Tk):
+class Alarm():
+    def __init__(self,title,time,snooze):
+        super(Alarm,self).__init__()
+        self.time = time
+        self.title = title
+        self.snooze = snooze
+    
+    def get_alarm_time(self):
+        return self.time
+
+    def get_alarm_title(self):
+        return self.title
+
+    def get_alarm_snooze(self):
+        return self.snooze
+
+
+
+class Αlarm_window(Tk):
+    def __init__(self,alarm):
+        super(Αlarm_window,self).__init__()
+        self.geometry("400x190")
+        self.title('Timer')
+
+        title = Label(self,text=alarm.get_alarm_title(),pady=10,font=('Arial',25))
+        title.pack()
+
+        time = Label(self,text=alarm.get_alarm_time(),pady=5,font=('Arial',15))
+        time.pack()
+
+        frame_buttons = Frame(self)
+        frame_buttons.pack(pady=5)
+
+        stop_button = Button(frame_buttons,text="Stop",font=('Arial',15),width=20)
+        stop_button.pack(pady=(5,2))
+        snooze_button = Button(frame_buttons,text="Snooze",font=('Arial',15),width=13)
+        snooze_button.pack(pady=(2,5))
+
+
+    def on_closing(self, event=0):
+        self.destroy()
+
+    def start(self):
+        self.mainloop()
+
+class Clock(Tk):
 
     def __init__(self):
-        super(Timer,self).__init__()
+        super(Clock,self).__init__()
 
         self.timer_status = "stoped"
         self.timer_or_countdown_status = "timer"
@@ -46,8 +91,7 @@ class Timer(Tk):
                 separator_4.grid_forget()
                 seconds_entery.grid_forget()
             
-            self.timer_or_countdown_status = "timer"
-            
+            self.timer_or_countdown_status = "timer"          
 
         def go_to_clock():
             self.title('Clock')
@@ -64,6 +108,9 @@ class Timer(Tk):
             frame_timer_and_countdown_buttons.pack_forget()
             frame_clock_buttons.pack(pady=20)
             clock()
+
+        #def go_to_alarms():
+            #if(self.timer_or_countdown_status = "timer"):
 
         def timer():
             if self.timer_status == "running":
@@ -179,7 +226,7 @@ class Timer(Tk):
             go_to_clock()
         
         self.geometry("500x200")
-        self.title('Timer')
+        self.title('Clock')
 
         #Create Frames
         frame_timer_type = Frame(self)
@@ -211,6 +258,7 @@ class Timer(Tk):
         countdown_button = Button(frame_timer_type,text='Countdown', width=10,foreground="red",command=go_to_countdown)
         timer_button = Button(frame_timer_type,text='Timer', width=10,foreground="red",command=go_to_timer)
         clock_button = Button(frame_timer_type,text='Clock', width=10,foreground="red",command=go_to_clock)
+        alarm_button = Button(frame_timer_type,text='Alarms', width=10,foreground="red",command=go_to_clock)
         
         start_button = Button(frame_timer_and_countdown_buttons,text='Start', width=10,foreground="red",command=start_timer)
         pause_button = Button(frame_timer_and_countdown_buttons,text='Pause', width=10,foreground="red",command=pause_timer)
@@ -224,6 +272,7 @@ class Timer(Tk):
         countdown_button.grid(row=0, column=0,padx=(2,10))
         timer_button.grid(row=0, column=1,padx=(2,10))
         clock_button.grid(row=0, column=2,padx=(2,10))
+        alarm_button.grid(row=0, column=3,padx=(2,10))
 
         frame_time_enterys.pack()
 
@@ -250,5 +299,10 @@ class Timer(Tk):
 
 
 if __name__ == "__main__":
-    app = Timer()
+    app = Clock()
     app.start()
+
+    alarm = Alarm('Alarm Title',"3:10:5","00:10:00")
+
+    #alarm_window = Αlarm_window(alarm)
+    #alarm_window.start()

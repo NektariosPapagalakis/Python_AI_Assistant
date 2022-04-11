@@ -6,7 +6,10 @@ This is an AI assistant for a PC using windows
 - [ ] Open url
 - [ ] Shutdown Computer
 - [ ] Lock Computer
+- [ ] Clock
 - [ ] Timer
+- [ ] Countdown
+- [ ] Alarm Clock
 - [ ] Manage Spotify
 - [ ] Program shutdown time
 - [ ] Calendar

@@ -7,3 +7,4 @@
 - [ ] Manage Spotify
 - [ ] Program shutdown time
 - [ ] Calendar
+- [ ] Make Notes

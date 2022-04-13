@@ -3,20 +3,28 @@ from tkinter import messagebox
 import time
 
 class Alarm():
-    def __init__(self,title,time,snooze):
+    def __init__(self,title,repeat,time,snooze,state):
         super(Alarm,self).__init__()
         self.time = time
+        self.repeat = repeat
         self.title = title
         self.snooze = snooze
-    
-    def get_alarm_time(self):
-        return self.time
+        self.state= state
 
     def get_alarm_title(self):
         return self.title
 
+    def get_alarm_repeat(self):
+        return self.repeat
+
+    def get_alarm_time(self):
+        return self.time
+
     def get_alarm_snooze(self):
         return self.snooze
+    
+    def get_alarm_state(self):
+        return self.state
 
 
 
@@ -52,6 +60,14 @@ class Clock(Tk):
     def __init__(self):
         super(Clock,self).__init__()
 
+        # Temp
+        self.alarm1 = Alarm("Alarm1 Title","once","1:10:5","00:10:00","off")
+        self.alarm2 = Alarm("Alarm2 Title","once","2:10:5","00:20:00","off")
+        self.alarm3 = Alarm("Alarm3 Title","once","3:10:5","00:30:00","on")
+        
+        self.alarm_list = (self.alarm1,self.alarm2,self.alarm3)
+        #Temp
+
         self.timer_status = "stoped"
         self.timer_or_countdown_status = "timer"
         self.time_format = "12-Hour"
@@ -70,6 +86,10 @@ class Clock(Tk):
 
             if self.timer_or_countdown_status == "clock":
                 frame_clock_buttons.pack_forget()
+                frame_timer_and_countdown_buttons.pack(pady=20)
+
+            if self.timer_or_countdown_status == "alarm":
+                frame_time_labels.pack(pady=20)
                 frame_timer_and_countdown_buttons.pack(pady=20)
                
             self.timer_or_countdown_status = "countdown"
@@ -90,6 +110,14 @@ class Clock(Tk):
                 minutes_entery.grid_forget()
                 separator_4.grid_forget()
                 seconds_entery.grid_forget()
+
+            elif self.timer_or_countdown_status == "clock":
+                frame_clock_buttons.pack_forget()
+                frame_timer_and_countdown_buttons.pack(pady=20)
+
+            elif self.timer_or_countdown_status == "alarm":
+                frame_time_labels.pack(pady=20)
+                frame_timer_and_countdown_buttons.pack(pady=20)
             
             self.timer_or_countdown_status = "timer"          
 
@@ -103,15 +131,38 @@ class Clock(Tk):
                 minutes_entery.grid_forget()
                 separator_4.grid_forget()
                 seconds_entery.grid_forget()
+
+            elif self.timer_or_countdown_status == "alarm":
+                frame_time_labels.pack(pady=20)
+                frame_clock_buttons.pack(pady=20)
             
             self.timer_or_countdown_status = "clock"
             frame_timer_and_countdown_buttons.pack_forget()
             frame_clock_buttons.pack(pady=20)
             clock()
 
-        #def go_to_alarms():
-            #if(self.timer_or_countdown_status = "timer"):
+        def go_to_alarms():
+            self.title('Alarm')
+            stop_timer()
 
+            if self.timer_or_countdown_status == "timer":
+                frame_time_labels.pack_forget()
+                frame_timer_and_countdown_buttons.pack_forget()
+            elif self.timer_or_countdown_status == "countdown":
+                hour_entery.grid_forget()
+                separator_3.grid_forget()
+                minutes_entery.grid_forget()
+                separator_4.grid_forget()
+                seconds_entery.grid_forget()
+                frame_timer_and_countdown_buttons.pack_forget()
+                frame_time_labels.pack_forget()
+            elif self.timer_or_countdown_status == "clock":
+                frame_time_labels.pack_forget()
+                frame_clock_buttons.pack_forget()
+            
+            self.timer_or_countdown_status = "alarm"
+            frame_alarm.pack(side="top", fill="x")
+            
         def timer():
             if self.timer_status == "running":
                 self.seconds = self.seconds + 1
@@ -225,6 +276,15 @@ class Clock(Tk):
             time_format_button.config(text=self.time_format)
             go_to_clock()
         
+        def select_alarm(event):
+            selection = event.widget.curselection()
+            index = selection[0]
+            print(self.alarm_list[index].get_alarm_title ())
+            print(self.alarm_list[index].get_alarm_repeat ())
+            print(self.alarm_list[index].get_alarm_time())
+            print(self.alarm_list[index].get_alarm_snooze())
+            print(self.alarm_list[index].get_alarm_state())
+
         self.geometry("500x200")
         self.title('Clock')
 
@@ -258,7 +318,7 @@ class Clock(Tk):
         countdown_button = Button(frame_timer_type,text='Countdown', width=10,foreground="red",command=go_to_countdown)
         timer_button = Button(frame_timer_type,text='Timer', width=10,foreground="red",command=go_to_timer)
         clock_button = Button(frame_timer_type,text='Clock', width=10,foreground="red",command=go_to_clock)
-        alarm_button = Button(frame_timer_type,text='Alarms', width=10,foreground="red",command=go_to_clock)
+        alarm_button = Button(frame_timer_type,text='Alarms', width=10,foreground="red",command=go_to_alarms)
         
         start_button = Button(frame_timer_and_countdown_buttons,text='Start', width=10,foreground="red",command=start_timer)
         pause_button = Button(frame_timer_and_countdown_buttons,text='Pause', width=10,foreground="red",command=pause_timer)
@@ -266,6 +326,50 @@ class Clock(Tk):
 
         time_format_button = Button(frame_clock_buttons,text=self.time_format, width=10,foreground="red",command=change_time_format)
         time_format_button.grid(row=0, column=10,padx=10)
+
+        ###############    Alarm
+        frame_alarm = Frame(self)
+        frame_list_of_alarms= Frame(frame_alarm)
+        frame_create_edit_alarm= Frame(frame_alarm)
+
+        frame_list_of_alarms.grid(row=0,column=0,padx=10,sticky='w')
+        frame_create_edit_alarm.grid(row=0,column=1,padx=10)
+
+        alarms = []
+        for a in self.alarm_list:
+            alarms.append(a.get_alarm_title()+"   "+a.get_alarm_time())
+        alarms_var = StringVar(value=alarms)
+
+        list_of_created_alarms = Listbox(frame_list_of_alarms, listvariable=alarms_var,selectmode='extended',width=25)
+        list_of_created_alarms.bind('<<ListboxSelect>>', select_alarm)
+        list_of_created_alarms.pack(pady=5)
+
+        alarm_title_label = Label(frame_create_edit_alarm,text='Alarm Title')
+        alarm_title_label.grid(row=0,columnspan=5, sticky='ew')
+
+        alarm_hour_entery = Entry(frame_create_edit_alarm, width=5)
+        alarm_hour_entery.insert(0, "00")
+        separator_5= Label(frame_create_edit_alarm,text=':', width=5)
+        alarm_minutes_entery = Entry(frame_create_edit_alarm, width=5)
+        alarm_minutes_entery.insert(0, "00")
+        separator_6= Label(frame_create_edit_alarm,text=':', width=5)
+        alarm_seconds_entery = Entry(frame_create_edit_alarm, width=5)
+        alarm_seconds_entery.insert(0, "00")
+
+        alarm_hour_entery.grid(row=1,column=0)
+        separator_5.grid(row=1,column=1)
+        alarm_minutes_entery.grid(row=1,column=2)
+        separator_6.grid(row=1,column=3)
+        alarm_seconds_entery.grid(row=1,column=4)
+
+        alarm_snooze_time_label = Label(frame_create_edit_alarm,text='Snooze Time : ')
+        alarm_snooze_time_entry = Entry(frame_create_edit_alarm, width=5)
+        alarm_snooze_time_entry.insert(0, "00:05:00")
+        create_edit_alarm_button = Button(frame_create_edit_alarm,text="Save/Create", width=10)
+
+        alarm_snooze_time_label.grid(row=2,columnspan=2, sticky='ew')
+        alarm_snooze_time_entry.grid(row=2,column=4)
+        create_edit_alarm_button.grid(row=3,column=3)
 
         #Plece at Window
         frame_timer_type.pack(fill=BOTH, expand=YES)
@@ -301,8 +405,6 @@ class Clock(Tk):
 if __name__ == "__main__":
     app = Clock()
     app.start()
-
-    alarm = Alarm('Alarm Title',"3:10:5","00:10:00")
 
     #alarm_window = Αlarm_window(alarm)
     #alarm_window.start()

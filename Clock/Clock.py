@@ -204,6 +204,18 @@ class Clock(Tk):
                 alarm_title_entry.delete(0, END)
                 alarm_title_entry.insert(0, "")
 
+        def alarm_cheack():
+            alarm_tile = alarm_title_entry.get()
+            alarm_hour = alarm_hour_entry.get()
+            alarm_minutes = alarm_minutes_entry.get()
+            alarm_snooze_hour = alarm_snooze_time_hour_entry.get()
+            alarm_snooze_minutes = alarm_snooze_time_minutes_entry.get()
+            print(alarm_tile)
+            print(alarm_hour)
+            print(alarm_minutes)
+            print(alarm_snooze_hour)
+            print(alarm_snooze_minutes)
+
         def new_alarm():
             self.is_alarm_selected = "no"
             create_edit_alarm_button.config(text="Create")
@@ -435,7 +447,7 @@ class Clock(Tk):
         separator_6.grid(row=0, column=2)
         alarm_snooze_time_minutes_entry.grid(row=0, column=3)
 
-        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10)
+        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10, command=alarm_cheack)
         create_edit_alarm_button.pack(pady=10)
 
         # Place at Window

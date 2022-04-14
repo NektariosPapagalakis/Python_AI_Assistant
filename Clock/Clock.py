@@ -276,7 +276,10 @@ class Clock(Tk):
                                     self.alarm_list[index].set_alarm_title(alarm_tile)
                                     self.alarm_list[index].set_alarm_time(alarm_time)
                                     self.alarm_list[index].set_alarm_snooze(snooze_time)
-                                save_data()
+                                    list_of_created_alarms.delete(index)
+                                    list_of_created_alarms.insert(index, alarm_tile + "   " + alarm_time)
+                                    #problem editint the first alarm
+                                #save_data()
 
         def new_alarm():
             self.is_alarm_selected = "no"

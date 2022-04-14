@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 import time
+import xml.etree.ElementTree as xml
 
 
 class Alarm:
@@ -20,8 +21,20 @@ class Alarm:
     def get_alarm_snooze(self):
         return self.snooze
 
-    def get_alarm_state(self):
+    def set_alarm_state(self):
         return self.state
+
+    def set_alarm_title(self, title):
+        self.title = title
+
+    def set_alarm_time(self, alarm_time):
+        self.alarm_time = alarm_time
+
+    def set_alarm_snooze(self, snooze):
+        self.snooze = snooze
+
+    def set_alarm_state(self, state):
+        self.state = state
 
 
 class AlarmWindow(Tk):
@@ -61,7 +74,8 @@ class Clock(Tk):
         self.alarm2 = Alarm("Alarm2 Title", "2:10", "00:20", "off")
         self.alarm3 = Alarm("Alarm3 Title", "3:10", "00:30", "on")
 
-        self.alarm_list = (self.alarm1, self.alarm2, self.alarm3)
+        self.alarm_list = []
+
         # Temp
 
         self.timer_status = "stopped"
@@ -75,6 +89,17 @@ class Clock(Tk):
         self.hour_countdown_start = 0
         self.minutes_countdown_start = 2
         self.seconds_countdown_start = 0
+
+        def load_alarms():
+            my_tree = xml.parse('alarms.xml')
+            my_root = my_tree.getroot()
+
+            for x in my_root.findall('alarm'):
+                title = x.find('title').text
+                alarm_time = x.find('alarm_time').text
+                snooze = x.find('snooze').text
+                state = x.find('state').text
+                self.alarm_list.append(Alarm(title, alarm_time, snooze, state))
 
         def go_to_countdown():
             self.title('Countdown')
@@ -151,7 +176,7 @@ class Clock(Tk):
             self.title('Alarm')
             if self.timer_status == 'running':
                 stop_timer()
-            self.geometry("500x250")
+            self.geometry("500x300")
 
             if self.timer_or_countdown_status == "timer":
                 frame_time_labels.pack_forget()
@@ -175,8 +200,7 @@ class Clock(Tk):
             self.is_alarm_selected = "yes"
             create_edit_alarm_button.config(text="Save")
 
-            selection = event.widget.curselection()
-            index = selection[0]
+            index = list_of_created_alarms.curselection()[0]
 
             alarm_title_entry.delete(0, END)
             alarm_title_entry.insert(0, self.alarm_list[index].get_alarm_title())
@@ -200,17 +224,59 @@ class Clock(Tk):
                 alarm_title_entry.delete(0, END)
                 alarm_title_entry.insert(0, "")
 
-        def alarm_check():
+        def alarm_check(e):
             alarm_tile = alarm_title_entry.get()
-            alarm_hour = alarm_hour_entry.get()
-            alarm_minutes = alarm_minutes_entry.get()
-            alarm_snooze_hour = alarm_snooze_time_hour_entry.get()
-            alarm_snooze_minutes = alarm_snooze_time_minutes_entry.get()
-            print(alarm_tile)
-            print(alarm_hour)
-            print(alarm_minutes)
-            print(alarm_snooze_hour)
-            print(alarm_snooze_minutes)
+            if alarm_tile == "":
+                alarm_tile = "Alarm"
+            alarm_hour = int(alarm_hour_entry.get())
+            if 0 > int(alarm_hour) or int(alarm_hour) > 23:
+                messagebox.showerror('Error', 'The hour field must be\nbetween 0 and 23')
+                alarm_hour_entry.focus()
+            else:
+                alarm_minutes = int(alarm_minutes_entry.get())
+                if 0 > int(alarm_minutes) or int(alarm_minutes) > 59:
+                    messagebox.showerror('Error', 'The minutes field must be\nbetween 0 and 59')
+                    alarm_minutes_entry.focus()
+                else:
+                    alarm_snooze_hour = int(alarm_snooze_time_hour_entry.get())
+                    if 0 > int(alarm_snooze_hour) or int(alarm_snooze_hour) > 23:
+                        messagebox.showerror('Error', 'The snooze hours field must be\nbetween 0 and 23')
+                        alarm_snooze_time_hour_entry.focus()
+                    else:
+                        alarm_snooze_minutes = int(alarm_snooze_time_minutes_entry.get())
+                        if 0 > int(alarm_snooze_minutes) or int(alarm_snooze_minutes) > 59:
+                            messagebox.showerror('Error', 'The snooze minutes field must be\nbetween 0 and 59')
+                            alarm_snooze_time_minutes_entry.focus()
+                        else:
+                            alarm_time = ""
+                            if alarm_hour < 10:
+                                alarm_time = "0" + str(alarm_hour) + ":"
+                            else:
+                                alarm_time = str(alarm_hour) + ":"
+                            if alarm_minutes < 10:
+                                alarm_time = alarm_time + "0" + str(alarm_minutes)
+                            else:
+                                alarm_time = alarm_time + str(alarm_minutes)
+
+                            snooze_time = ""
+                            if alarm_snooze_hour < 10:
+                                snooze_time = "0" + str(alarm_snooze_hour) + ":"
+                            else:
+                                snooze_time = str(alarm_snooze_hour) + ":"
+                            if alarm_snooze_minutes < 10:
+                                snooze_time = snooze_time + "0" + str(alarm_snooze_minutes)
+                            else:
+                                snooze_time = snooze_time + str(alarm_snooze_minutes)
+                                if self.is_alarm_selected == "no":
+                                    list_of_created_alarms.insert(list_of_created_alarms.size(), alarm_tile + "   " + alarm_time)
+                                    self.alarm_list.append(Alarm(alarm_tile, alarm_time, snooze_time, "on"))
+                                    messagebox.showinfo('Success', 'The alarm was creates\nsuccessfully')
+                                else:
+                                    index = list_of_created_alarms.curselection()[0]
+                                    self.alarm_list[index].set_alarm_title(alarm_tile)
+                                    self.alarm_list[index].set_alarm_time(alarm_time)
+                                    self.alarm_list[index].set_alarm_snooze(snooze_time)
+                                save_data()
 
         def new_alarm():
             self.is_alarm_selected = "no"
@@ -343,9 +409,35 @@ class Clock(Tk):
             time_format_button.config(text=self.time_format)
             go_to_clock()
 
+        def save_data():
+            xml_doc = xml.Element('metadata')
+            for a in self.alarm_list:
+                alarm = xml.SubElement(xml_doc, "alarm")
+                xml.SubElement(alarm, "title").text = a.get_alarm_title()
+                xml.SubElement(alarm, "alarm_time").text = a.get_alarm_time()
+                xml.SubElement(alarm, "snooze").text = a.get_alarm_snooze()
+                xml.SubElement(alarm, "state").text = "on"
+
+            def prettify(element, indent='  '):
+                queue = [(0, element)]  # (level, element)
+                while queue:
+                    level, element = queue.pop(0)
+                    children = [(level + 1, child) for child in list(element)]
+                    if children:
+                        element.text = '\n' + indent * (level + 1)  # for child open
+                    if queue:
+                        element.tail = '\n' + indent * queue[0][0]  # for sibling open
+                    else:
+                        element.tail = '\n' + indent * (level - 1)  # for parent close
+                    queue[0:0] = children  # prepend so children come before siblings
+
+            prettify(xml_doc)
+            tree = xml.ElementTree(xml_doc)
+            tree.write("alarms.xml", encoding="UTF-8", xml_declaration=True)
+
         self.geometry("500x200")
         self.title('Clock')
-
+        load_alarms()
         # Create Frames
         frame_timer_type = Frame(self)
         frame_time_labels = Frame(self)
@@ -408,10 +500,12 @@ class Clock(Tk):
         list_of_created_alarms.pack(pady=5)
 
         new_alarm_button = Button(frame_list_of_alarms, text="New Alarm", command=new_alarm)
-        new_alarm_button.pack(pady=(5, 10))
+        delete_alarm_button = Button(frame_list_of_alarms, text="Delete")
+        new_alarm_button.pack(pady=(5, 5))
+        delete_alarm_button.pack(pady=(5, 10))
 
         alarm_title_entry = Entry(frame_create_edit_alarm)
-        alarm_title_entry.bind("<Button-1>",clear_alarm_tile)
+        alarm_title_entry.bind("<Button-1>", clear_alarm_tile)
         alarm_title_entry.insert(0, 'Alarm Title')
         alarm_title_entry.pack(padx=10)
 
@@ -443,8 +537,11 @@ class Clock(Tk):
         separator_6.grid(row=0, column=2)
         alarm_snooze_time_minutes_entry.grid(row=0, column=3)
 
-        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10, command=alarm_check)
+        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10)
         create_edit_alarm_button.pack(pady=10)
+        create_edit_alarm_button.bind('<Return>', alarm_check)
+        create_edit_alarm_button.bind('<Button-1>', alarm_check)
+        #             ALARM
 
         # Place at Window
         frame_timer_type.pack(fill=BOTH, expand=YES)

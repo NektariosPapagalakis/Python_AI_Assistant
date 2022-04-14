@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <alarm>
+    <title>Alarm 1 Title</title>
+    <alarm_time>01:00</alarm_time>
+    <snooze>00:10</snooze>
+    <state>on</state>
+  </alarm>
+  <alarm>
+    <title>Alarm 2 Title</title>
+    <alarm_time>02:02</alarm_time>
+    <snooze>20:22</snooze>
+    <state>on</state>
+  </alarm>
+  <alarm>
+    <title>Alarm 3 Title</title>
+    <alarm_time>03:33</alarm_time>
+    <snooze>03:33</snooze>
+    <state>on</state>
+  </alarm>
+</metadata>

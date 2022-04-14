@@ -4,10 +4,9 @@ import time
 
 
 class Alarm:
-    def __init__(self, title, repeat, time, snooze, state):
+    def __init__(self, title, alarm_time, snooze, state):
         super(Alarm, self).__init__()
-        self.time = time
-        self.repeat = repeat
+        self.alarm_time = alarm_time
         self.title = title
         self.snooze = snooze
         self.state = state
@@ -15,11 +14,8 @@ class Alarm:
     def get_alarm_title(self):
         return self.title
 
-    def get_alarm_repeat(self):
-        return self.repeat
-
     def get_alarm_time(self):
-        return self.time
+        return self.alarm_time
 
     def get_alarm_snooze(self):
         return self.snooze
@@ -61,9 +57,9 @@ class Clock(Tk):
         super(Clock, self).__init__()
 
         # Temp
-        self.alarm1 = Alarm("Alarm1 Title", "once", "1:10", "00:10", "off")
-        self.alarm2 = Alarm("Alarm2 Title", "once", "2:10", "00:20", "off")
-        self.alarm3 = Alarm("Alarm3 Title", "once", "3:10", "00:30", "on")
+        self.alarm1 = Alarm("Alarm1 Title", "1:10", "00:10", "off")
+        self.alarm2 = Alarm("Alarm2 Title", "2:10", "00:20", "off")
+        self.alarm3 = Alarm("Alarm3 Title", "3:10", "00:30", "on")
 
         self.alarm_list = (self.alarm1, self.alarm2, self.alarm3)
         # Temp
@@ -204,17 +200,32 @@ class Clock(Tk):
                 alarm_title_entry.delete(0, END)
                 alarm_title_entry.insert(0, "")
 
-        def alarm_cheack():
+        def alarm_check():
             alarm_tile = alarm_title_entry.get()
-            alarm_hour = alarm_hour_entry.get()
-            alarm_minutes = alarm_minutes_entry.get()
-            alarm_snooze_hour = alarm_snooze_time_hour_entry.get()
-            alarm_snooze_minutes = alarm_snooze_time_minutes_entry.get()
-            print(alarm_tile)
-            print(alarm_hour)
-            print(alarm_minutes)
-            print(alarm_snooze_hour)
-            print(alarm_snooze_minutes)
+            if alarm_tile == "":
+                alarm_tile = "Alarm"
+            else:
+                alarm_hour = alarm_hour_entry.get()
+                if int(alarm_hour) < 0 or int(alarm_hour) > 23:
+                    messagebox.showerror('Error', 'The field hour must be\nbetween 0 and 23')
+                    alarm_hour_entry.focus()
+                else:
+                    alarm_minutes = alarm_minutes_entry.get()
+                    if int(alarm_minutes) < 0 or int(alarm_minutes) > 29:
+                        messagebox.showerror('Error', 'The field minutes must be\nbetween 0 and 59')
+                        alarm_minutes_entry.focus()
+                    else:
+                        alarm_snooze_hour = alarm_snooze_time_hour_entry.get()
+                        if int(alarm_snooze_hour) < 0 or int(alarm_snooze_hour) > 23:
+                            messagebox.showerror('Error', 'The field Snooze hour\nmust be between 0 and 23')
+                            alarm_snooze_time_hour_entry.focus()
+                        else:
+                            alarm_snooze_minutes = alarm_snooze_time_minutes_entry.get()
+                            if int(alarm_snooze_minutes) < 0 or int(alarm_snooze_minutes) > 23:
+                                messagebox.showerror('Error', 'The field Snooze minutes\nmust be between 0 and 59')
+                                alarm_snooze_time_minutes_entry.focus()
+                            else:
+                                messagebox.showinfo('Complete', 'The alarm is\nsuccessfully created')
 
         def new_alarm():
             self.is_alarm_selected = "no"
@@ -447,7 +458,7 @@ class Clock(Tk):
         separator_6.grid(row=0, column=2)
         alarm_snooze_time_minutes_entry.grid(row=0, column=3)
 
-        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10, command=alarm_cheack)
+        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10, command=alarm_check)
         create_edit_alarm_button.pack(pady=10)
 
         # Place at Window

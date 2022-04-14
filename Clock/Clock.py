@@ -4,22 +4,18 @@ import time
 
 
 class Alarm:
-    def __init__(self, title, repeat, time, snooze, state):
+    def __init__(self, title, alarm_time, snooze, state):
         super(Alarm, self).__init__()
-        self.time = time
-        self.repeat = repeat
         self.title = title
+        self.alarm_time = alarm_time
         self.snooze = snooze
         self.state = state
 
     def get_alarm_title(self):
         return self.title
 
-    def get_alarm_repeat(self):
-        return self.repeat
-
     def get_alarm_time(self):
-        return self.time
+        return self.alarm_time
 
     def get_alarm_snooze(self):
         return self.snooze
@@ -61,9 +57,9 @@ class Clock(Tk):
         super(Clock, self).__init__()
 
         # Temp
-        self.alarm1 = Alarm("Alarm1 Title", "once", "1:10", "00:10", "off")
-        self.alarm2 = Alarm("Alarm2 Title", "once", "2:10", "00:20", "off")
-        self.alarm3 = Alarm("Alarm3 Title", "once", "3:10", "00:30", "on")
+        self.alarm1 = Alarm("Alarm1 Title", "1:10", "00:10", "off")
+        self.alarm2 = Alarm("Alarm2 Title", "2:10", "00:20", "off")
+        self.alarm3 = Alarm("Alarm3 Title", "3:10", "00:30", "on")
 
         self.alarm_list = (self.alarm1, self.alarm2, self.alarm3)
         # Temp
@@ -204,7 +200,7 @@ class Clock(Tk):
                 alarm_title_entry.delete(0, END)
                 alarm_title_entry.insert(0, "")
 
-        def alarm_cheack():
+        def alarm_check():
             alarm_tile = alarm_title_entry.get()
             alarm_hour = alarm_hour_entry.get()
             alarm_minutes = alarm_minutes_entry.get()
@@ -447,7 +443,7 @@ class Clock(Tk):
         separator_6.grid(row=0, column=2)
         alarm_snooze_time_minutes_entry.grid(row=0, column=3)
 
-        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10, command=alarm_cheack)
+        create_edit_alarm_button = Button(frame_create_edit_alarm, text="Create", width=10, command=alarm_check)
         create_edit_alarm_button.pack(pady=10)
 
         # Place at Window
